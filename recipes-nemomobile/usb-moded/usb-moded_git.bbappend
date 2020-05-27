@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend_mooneye := "${THISDIR}/usb-moded:"
+FILESEXTRAPATHS_prepend_catfish := "${THISDIR}/usb-moded:"

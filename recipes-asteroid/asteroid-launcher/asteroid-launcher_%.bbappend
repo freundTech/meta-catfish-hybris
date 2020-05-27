@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_prepend_mooneye := "${THISDIR}/asteroid-launcher:"
-SRC_URI_append_mooneye = " file://default.conf"
+FILESEXTRAPATHS_prepend_catfish := "${THISDIR}/asteroid-launcher:"
+SRC_URI_append_catfish = " file://default.conf"

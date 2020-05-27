@@ -1,1 +1,1 @@
-DEPENDS_append_mooneye = " libhybris "
+DEPENDS_append_catfish = " libhybris "
