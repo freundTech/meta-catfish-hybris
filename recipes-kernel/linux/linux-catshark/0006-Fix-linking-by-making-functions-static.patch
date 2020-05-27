@@ -1,0 +1,32 @@
+From 3abb16b7c739b99fe74577ec8bc8f5814c3557d3 Mon Sep 17 00:00:00 2001
+From: Adrian Freund <adrian@freund.io>
+Date: Wed, 27 May 2020 13:35:54 +0200
+Subject: [PATCH 6/6] Fix linking by making functions static
+
+---
+ drivers/mfd/wcd9xxx-irq.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mfd/wcd9xxx-irq.c b/drivers/mfd/wcd9xxx-irq.c
+index 02fdbf8a5d4e..1d1c147984f6 100644
+--- a/drivers/mfd/wcd9xxx-irq.c
++++ b/drivers/mfd/wcd9xxx-irq.c
+@@ -405,13 +405,13 @@ void wcd9xxx_free_irq(struct wcd9xxx_core_resource *wcd9xxx_res,
+ 	free_irq(phyirq_to_virq(wcd9xxx_res, irq), data);
+ }
+ 
+-void wcd9xxx_enable_irq(struct wcd9xxx_core_resource *wcd9xxx_res, int irq)
++static void wcd9xxx_enable_irq(struct wcd9xxx_core_resource *wcd9xxx_res, int irq)
+ {
+ 	if (wcd9xxx_res->irq)
+ 		enable_irq(phyirq_to_virq(wcd9xxx_res, irq));
+ }
+ 
+-void wcd9xxx_disable_irq(struct wcd9xxx_core_resource *wcd9xxx_res, int irq)
++static void wcd9xxx_disable_irq(struct wcd9xxx_core_resource *wcd9xxx_res, int irq)
+ {
+ 	if (wcd9xxx_res->irq)
+ 		disable_irq_nosync(phyirq_to_virq(wcd9xxx_res, irq));
+-- 
+2.26.2
+

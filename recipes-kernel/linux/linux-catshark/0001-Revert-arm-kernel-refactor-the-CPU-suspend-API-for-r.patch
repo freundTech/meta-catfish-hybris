@@ -1,0 +1,135 @@
+From bd4ff384147e85b2949626339f2e799156832fff Mon Sep 17 00:00:00 2001
+From: Adrian Freund <adrian@freund.io>
+Date: Wed, 27 May 2020 10:27:05 +0200
+Subject: [PATCH] Revert "arm: kernel: refactor the CPU suspend API for
+ retention states"
+
+This reverts commit 74e69e9f1488f37945c8d8a7a0548cdbf84d3d88.
+---
+ arch/arm/include/asm/suspend.h |  6 +-----
+ arch/arm/kernel/sleep.S        |  4 ++--
+ arch/arm/kernel/suspend.c      | 20 +++++---------------
+ drivers/power/qcom/msm-pm.c    |  5 +++++
+ 4 files changed, 13 insertions(+), 22 deletions(-)
+
+diff --git a/arch/arm/include/asm/suspend.h b/arch/arm/include/asm/suspend.h
+index 147af54466d7..cd20029bcd94 100644
+--- a/arch/arm/include/asm/suspend.h
++++ b/arch/arm/include/asm/suspend.h
+@@ -7,10 +7,6 @@ struct sleep_save_sp {
+ };
+ 
+ extern void cpu_resume(void);
+-extern int cpu_suspend(unsigned long);
+-
+-extern int __cpu_suspend(unsigned long, int (*fn)(unsigned long));
+-extern int __cpu_suspend_enter(unsigned long arg, int (*fn)(unsigned long),
+-							unsigned int);
++extern int cpu_suspend(unsigned long, int (*)(unsigned long));
+ 
+ #endif
+diff --git a/arch/arm/kernel/sleep.S b/arch/arm/kernel/sleep.S
+index 4c294298b8b8..e1e60e5a7a27 100644
+--- a/arch/arm/kernel/sleep.S
++++ b/arch/arm/kernel/sleep.S
+@@ -57,7 +57,7 @@
+  *  r1 = suspend function
+  *  r2 = MPIDR value the resuming CPU will use
+  */
+-ENTRY(__cpu_suspend_enter)
++ENTRY(__cpu_suspend)
+ 	stmfd	sp!, {r4 - r11, lr}
+ #ifdef MULTI_CPU
+ 	ldr	r10, =processor
+@@ -83,7 +83,7 @@ ENTRY(__cpu_suspend_enter)
+ 	bl	__cpu_suspend_save
+ 	adr	lr, BSYM(cpu_suspend_abort)
+ 	ldmfd	sp!, {r0, pc}		@ call suspend fn
+-ENDPROC(__cpu_suspend_enter)
++ENDPROC(__cpu_suspend)
+ 	.ltorg
+ 
+ cpu_suspend_abort:
+diff --git a/arch/arm/kernel/suspend.c b/arch/arm/kernel/suspend.c
+index 5a6bcaa6252a..2835d35234ca 100644
+--- a/arch/arm/kernel/suspend.c
++++ b/arch/arm/kernel/suspend.c
+@@ -9,8 +9,8 @@
+ #include <asm/smp_plat.h>
+ #include <asm/suspend.h>
+ #include <asm/tlbflush.h>
+-#include <asm/psci.h>
+ 
++extern int __cpu_suspend(unsigned long, int (*)(unsigned long), u32 cpuid);
+ extern void cpu_resume_mmu(void);
+ 
+ #ifdef CONFIG_MMU
+@@ -18,7 +18,7 @@ extern void cpu_resume_mmu(void);
+  * Hide the first two arguments to __cpu_suspend - these are an implementation
+  * detail which platform code shouldn't have to know about.
+  */
+-int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
++int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ {
+ 	struct mm_struct *mm = current->active_mm;
+ 	u32 __mpidr = cpu_logical_map(smp_processor_id());
+@@ -33,7 +33,7 @@ int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ 	 * resume (indicated by a zero return code), we need to switch
+ 	 * back to the correct page tables.
+ 	 */
+-	ret = __cpu_suspend_enter(arg, fn, __mpidr);
++	ret = __cpu_suspend(arg, fn, __mpidr);
+ 	if (ret == 0) {
+ 		cpu_switch_mm(mm->pgd, mm);
+ 		local_flush_bp_all();
+@@ -43,10 +43,10 @@ int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ 	return ret;
+ }
+ #else
+-int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
++int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ {
+ 	u32 __mpidr = cpu_logical_map(smp_processor_id());
+-	return __cpu_suspend_enter(arg, fn, __mpidr);
++	return __cpu_suspend(arg, fn, __mpidr);
+ }
+ #define	idmap_pgd	NULL
+ #endif
+@@ -88,16 +88,6 @@ void __cpu_suspend_save(u32 *ptr, u32 ptrsz, u32 sp, u32 *save_ptr)
+ 			  virt_to_phys(save_ptr) + sizeof(*save_ptr));
+ }
+ 
+-int cpu_suspend(unsigned long arg)
+-{
+-#if defined(CONFIG_ARM_PSCI)
+-	return cpu_psci_cpu_suspend(arg);
+-#else
+-	WARN_ONCE(true, "PSCI is not enabled\n");
+-	return 0;
+-#endif
+-}
+-
+ extern struct sleep_save_sp sleep_save_sp;
+ 
+ static int cpu_suspend_alloc_sp(void)
+diff --git a/drivers/power/qcom/msm-pm.c b/drivers/power/qcom/msm-pm.c
+index 26da722c3632..a2f83536da66 100644
+--- a/drivers/power/qcom/msm-pm.c
++++ b/drivers/power/qcom/msm-pm.c
+@@ -285,8 +285,13 @@ static bool __ref msm_pm_spm_power_collapse(
+ 
+ 	msm_jtag_save_state();
+ 
++#ifdef CONFIG_CPU_V7
++	collapsed = save_cpu_regs ?
++		!cpu_suspend(0, msm_pm_collapse) : msm_pm_pc_hotplug();
++#else
+ 	collapsed = save_cpu_regs ?
+ 		!__cpu_suspend(0, msm_pm_collapse) : msm_pm_pc_hotplug();
++#endif
+ 
+ 	msm_jtag_restore_state();
+ 
+-- 
+2.26.2
+

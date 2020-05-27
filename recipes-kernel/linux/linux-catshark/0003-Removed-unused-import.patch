@@ -1,0 +1,24 @@
+From 6f0a2b8bd22b7459ce094d3cf21c59ba39fcfe59 Mon Sep 17 00:00:00 2001
+From: Adrian Freund <adrian@freund.io>
+Date: Wed, 27 May 2020 11:38:37 +0200
+Subject: [PATCH 3/3] Removed unused import
+
+---
+ include/trace/events/msm_cam.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/trace/events/msm_cam.h b/include/trace/events/msm_cam.h
+index 001617e0258e..6a0a1586a2a8 100644
+--- a/include/trace/events/msm_cam.h
++++ b/include/trace/events/msm_cam.h
+@@ -16,7 +16,6 @@
+ #if !defined(_TRACE_MSM_VFE_H) || defined(TRACE_HEADER_MULTI_READ)
+ #define _TRACE_MSM_VFE_H
+ 
+-#include "msm_isp.h"
+ #include <linux/types.h>
+ #include <linux/tracepoint.h>
+ 
+-- 
+2.26.2
+

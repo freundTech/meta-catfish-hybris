@@ -1,0 +1,24 @@
+From 5bd0613d4f524eeaa99abbb90bf9555bf86103f7 Mon Sep 17 00:00:00 2001
+From: Adrian Freund <adrian@freund.io>
+Date: Wed, 27 May 2020 12:30:42 +0200
+Subject: [PATCH 5/5] Add missing include
+
+---
+ sound/soc/codecs/wcd9335.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sound/soc/codecs/wcd9335.c b/sound/soc/codecs/wcd9335.c
+index c94623c2283a..05075ff0b568 100644
+--- a/sound/soc/codecs/wcd9335.c
++++ b/sound/soc/codecs/wcd9335.c
+@@ -22,6 +22,7 @@
+ #include <linux/wait.h>
+ #include <linux/bitops.h>
+ #include <linux/mfd/wcd9xxx/core.h>
++#include <linux/mfd/wcd9xxx/core-resource.h>
+ #include <linux/mfd/wcd9xxx/wcd9xxx_registers.h>
+ #include <linux/mfd/wcd9335/registers.h>
+ #include <linux/mfd/wcd9xxx/pdata.h>
+-- 
+2.26.2
+

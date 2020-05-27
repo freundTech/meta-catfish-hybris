@@ -1,0 +1,25 @@
+From d588c17f852236bbb64dec7add52ccd53c1a955b Mon Sep 17 00:00:00 2001
+From: Adrian Freund <adrian@freund.io>
+Date: Wed, 27 May 2020 11:08:27 +0200
+Subject: [PATCH 2/2] Fix include in bcm_gps_hostwake.c
+
+---
+ drivers/char/broadcom/bbd2.0/bcm_gps_hostwake.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/broadcom/bbd2.0/bcm_gps_hostwake.c b/drivers/char/broadcom/bbd2.0/bcm_gps_hostwake.c
+index 9720898318e3..c7e5dfbb4afd 100644
+--- a/drivers/char/broadcom/bbd2.0/bcm_gps_hostwake.c
++++ b/drivers/char/broadcom/bbd2.0/bcm_gps_hostwake.c
+@@ -39,7 +39,7 @@
+ #include <linux/gpio.h>
+ #include <linux/wakelock.h>
+ 
+-#include <bcm_gps_hostwake.h>
++#include "bcm_gps_hostwake.h"
+ 
+ #define GPS_VERSION	"1.01"
+ #define PFX			"bcmgps: "
+-- 
+2.26.2
+

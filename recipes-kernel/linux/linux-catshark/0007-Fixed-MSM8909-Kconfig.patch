@@ -1,0 +1,24 @@
+From f02e21b0611b729bd57b225fb854bb96ab8f490d Mon Sep 17 00:00:00 2001
+From: Adrian Freund <adrian@freund.io>
+Date: Wed, 27 May 2020 15:36:51 +0200
+Subject: [PATCH 7/7] Fixed MSM8909 Kconfig
+
+---
+ sound/soc/msm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sound/soc/msm/Kconfig b/sound/soc/msm/Kconfig
+index 0e8e6f284985..d549511a9647 100644
+--- a/sound/soc/msm/Kconfig
++++ b/sound/soc/msm/Kconfig
+@@ -271,6 +271,7 @@ config SND_SOC_MSM8909
+ 	select SND_SOC_DIGITAL_CDC
+ 	select SND_SOC_WSA881X_ANALOG
+ 	select SND_SOC_WSA881X
++    select SND_SOC_WCD9330
+ 	select SND_SOC_WCD9335
+         select SND_SOC_CPE
+ 	select SND_HWDEP
+-- 
+2.26.2
+
